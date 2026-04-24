@@ -1,11 +1,938 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>My First Site</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一柿 — 庄原</title>
+  <style>
+    /* ─── CSS Variables ─────────────────────────── */
+    :root {
+      --ink:        #1a1814;
+      --ink-mid:    #3a3630;
+      --stone:      #7a756e;
+      --mist:       #b8b2a8;
+      --paper:      #f5f3ef;
+      --cream:      #faf9f6;
+      --white:      #ffffff;
+      --accent:     #8b7355;
+
+      --font-ja:    "Hiragino Mincho ProN", "Yu Mincho", "游明朝", YuMincho, "HG明朝E", serif;
+      --font-latin: Georgia, "Times New Roman", serif;
+      --font-mono:  "Hiragino Kaku Gothic ProN", "Meiryo", monospace;
+
+      --gap-xs:  0.5rem;
+      --gap-sm:  1rem;
+      --gap-md:  2.5rem;
+      --gap-lg:  5rem;
+      --gap-xl:  9rem;
+      --gap-2xl: 14rem;
+    }
+
+    /* ─── Reset ─────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      background: var(--cream);
+      color: var(--ink);
+      font-family: var(--font-ja);
+      line-height: 1.9;
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    /* ─── Typography ─────────────────────────────── */
+    .kanji-display {
+      font-family: var(--font-ja);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+    }
+
+    .latin-sm {
+      font-family: var(--font-latin);
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    /* ─── Header ────────────────────────────────── */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.8rem 3.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      mix-blend-mode: multiply;
+    }
+
+    .logo {
+      font-family: var(--font-ja);
+      font-size: 1.15rem;
+      font-weight: 400;
+      letter-spacing: 0.25em;
+      color: var(--ink);
+      text-decoration: none;
+      opacity: 0;
+      animation: fadeIn 1.2s 2s forwards;
+    }
+
+    nav {
+      display: flex;
+      gap: 2.5rem;
+      align-items: center;
+      opacity: 0;
+      animation: fadeIn 1.2s 2.2s forwards;
+    }
+
+    nav a {
+      font-family: var(--font-latin);
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--ink-mid);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    nav a:hover { color: var(--stone); }
+
+    .nav-reserve {
+      border: 1px solid var(--ink-mid);
+      padding: 0.45rem 1.1rem;
+      font-size: 0.6rem !important;
+      letter-spacing: 0.25em !important;
+      transition: background 0.3s, color 0.3s !important;
+    }
+
+    .nav-reserve:hover {
+      background: var(--ink) !important;
+      color: var(--cream) !important;
+      border-color: var(--ink) !important;
+    }
+
+    /* ─── Hero ───────────────────────────────────── */
+    #hero {
+      position: relative;
+      height: 100svh;
+      min-height: 640px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 70% at 30% 50%, rgba(139,115,85,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 75% 30%, rgba(90,80,60,0.04) 0%, transparent 60%),
+        var(--cream);
+    }
+
+    /* Grain overlay */
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .hero-label {
+      opacity: 0;
+      animation: fadeSlideUp 1s 0.3s forwards;
+    }
+
+    .hero-title {
+      font-size: clamp(5rem, 16vw, 13rem);
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      line-height: 1;
+      color: var(--ink);
+      opacity: 0;
+      animation: fadeIn 1.4s 0.7s forwards;
+    }
+
+    .hero-sub {
+      font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+      letter-spacing: 0.5em;
+      color: var(--stone);
+      font-weight: 400;
+      opacity: 0;
+      animation: fadeSlideUp 1s 1.2s forwards;
+    }
+
+    .hero-tagline {
+      margin-top: var(--gap-md);
+      font-size: clamp(0.8rem, 1.5vw, 1rem);
+      letter-spacing: 0.2em;
+      line-height: 2.2;
+      color: var(--ink-mid);
+      opacity: 0;
+      animation: fadeSlideUp 1s 1.6s forwards;
+    }
+
+    /* Scroll indicator */
+    .scroll-line {
+      position: absolute;
+      bottom: 3rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      opacity: 0;
+      animation: fadeIn 1s 2.5s forwards;
+    }
+
+    .scroll-line span {
+      font-family: var(--font-latin);
+      font-size: 0.55rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+
+    .scroll-line-bar {
+      width: 1px;
+      height: 50px;
+      background: linear-gradient(to bottom, var(--mist), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    /* ─── Section Commons ───────────────────────── */
+    section {
+      padding: var(--gap-2xl) clamp(2rem, 8vw, 9rem);
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: var(--gap-lg);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.9s, transform 0.9s;
+    }
+
+    .section-label.visible { opacity: 1; transform: translateY(0); }
+
+    .section-label-line {
+      width: 3rem;
+      height: 1px;
+      background: var(--mist);
+    }
+
+    .section-number {
+      font-family: var(--font-latin);
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      color: var(--mist);
+    }
+
+    .section-name {
+      font-family: var(--font-latin);
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    /* ─── Concept ───────────────────────────────── */
+    #concept {
+      background: var(--cream);
+      padding-top: var(--gap-2xl);
+      padding-bottom: var(--gap-2xl);
+    }
+
+    .concept-inner {
+      max-width: 860px;
+    }
+
+    .concept-title {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      line-height: 1.6;
+      color: var(--ink);
+      margin-bottom: var(--gap-lg);
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 1.1s 0.1s, transform 1.1s 0.1s;
+    }
+
+    .concept-title.visible { opacity: 1; transform: translateY(0); }
+
+    .concept-body {
+      font-size: clamp(0.88rem, 1.3vw, 1rem);
+      line-height: 2.4;
+      color: var(--ink-mid);
+      letter-spacing: 0.05em;
+      max-width: 600px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1.1s 0.3s, transform 1.1s 0.3s;
+    }
+
+    .concept-body.visible { opacity: 1; transform: translateY(0); }
+
+    .concept-philosophy {
+      margin-top: var(--gap-lg);
+      padding: var(--gap-md) 0;
+      border-top: 1px solid var(--mist);
+      display: flex;
+      align-items: baseline;
+      gap: 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1.1s 0.5s, transform 1.1s 0.5s;
+    }
+
+    .concept-philosophy.visible { opacity: 1; transform: translateY(0); }
+
+    .philosophy-ja {
+      font-size: 1.5rem;
+      letter-spacing: 0.2em;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .philosophy-caption {
+      font-size: 0.78rem;
+      color: var(--stone);
+      letter-spacing: 0.08em;
+      line-height: 1.8;
+    }
+
+    /* ─── Cuisine ────────────────────────────────── */
+    #cuisine {
+      background: var(--paper);
+      position: relative;
+    }
+
+    .cuisine-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap-xl);
+      align-items: start;
+      margin-top: var(--gap-lg);
+    }
+
+    .cuisine-text {
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: opacity 1.1s 0.2s, transform 1.1s 0.2s;
+    }
+
+    .cuisine-text.visible { opacity: 1; transform: translateX(0); }
+
+    .cuisine-title {
+      font-size: clamp(1.5rem, 3vw, 2.4rem);
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      line-height: 1.5;
+      margin-bottom: var(--gap-md);
+      color: var(--ink);
+    }
+
+    .cuisine-body {
+      font-size: 0.9rem;
+      line-height: 2.4;
+      color: var(--ink-mid);
+      letter-spacing: 0.04em;
+      margin-bottom: var(--gap-md);
+    }
+
+    .cuisine-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border-top: 1px solid rgba(122,117,110,0.2);
+    }
+
+    .cuisine-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid rgba(122,117,110,0.15);
+    }
+
+    .cuisine-item-ja {
+      font-size: 0.88rem;
+      letter-spacing: 0.1em;
+      color: var(--ink);
+    }
+
+    .cuisine-item-en {
+      font-family: var(--font-latin);
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      color: var(--mist);
+      font-style: italic;
+    }
+
+    .cuisine-visual {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-md);
+      opacity: 0;
+      transform: translateX(30px);
+      transition: opacity 1.1s 0.4s, transform 1.1s 0.4s;
+    }
+
+    .cuisine-visual.visible { opacity: 1; transform: translateX(0); }
+
+    /* Placeholder imagery — ink-wash style SVG blocks */
+    .art-block {
+      width: 100%;
+      aspect-ratio: 4/3;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .art-block svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .art-block-sm {
+      width: 60%;
+      align-self: flex-end;
+      aspect-ratio: 1/1;
+    }
+
+    /* ─── Access ─────────────────────────────────── */
+    #access {
+      background: var(--ink);
+      color: var(--paper);
+      padding: var(--gap-2xl) clamp(2rem, 8vw, 9rem);
+    }
+
+    #access .section-label-line { background: rgba(255,255,255,0.2); }
+    #access .section-number { color: rgba(255,255,255,0.3); }
+    #access .section-name { color: rgba(255,255,255,0.45); }
+
+    .access-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--gap-xl);
+      align-items: start;
+      margin-top: var(--gap-lg);
+    }
+
+    .access-title {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 400;
+      letter-spacing: 0.15em;
+      line-height: 1.6;
+      margin-bottom: var(--gap-md);
+      color: var(--cream);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1.1s 0.1s, transform 1.1s 0.1s;
+    }
+
+    .access-title.visible { opacity: 1; transform: translateY(0); }
+
+    .access-body {
+      font-size: 0.88rem;
+      line-height: 2.4;
+      color: var(--mist);
+      letter-spacing: 0.05em;
+      margin-bottom: var(--gap-lg);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1.1s 0.25s, transform 1.1s 0.25s;
+    }
+
+    .access-body.visible { opacity: 1; transform: translateY(0); }
+
+    .access-detail {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-md);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1.1s 0.4s, transform 1.1s 0.4s;
+    }
+
+    .access-detail.visible { opacity: 1; transform: translateY(0); }
+
+    .access-row {
+      display: flex;
+      gap: 2rem;
+      padding-bottom: var(--gap-md);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .access-row-label {
+      font-family: var(--font-latin);
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      min-width: 5rem;
+      padding-top: 0.2rem;
+    }
+
+    .access-row-value {
+      font-size: 0.88rem;
+      letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.9;
+    }
+
+    .access-map-placeholder {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      aspect-ratio: 1 / 1.1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 1.1s 0.3s, transform 1.1s 0.3s;
+    }
+
+    .access-map-placeholder.visible { opacity: 1; transform: translateX(0); }
+
+    .map-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 8px rgba(139,115,85,0.15), 0 0 0 16px rgba(139,115,85,0.07);
+      animation: mapPulse 3s ease-in-out infinite;
+    }
+
+    .map-lines {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* ─── Reserve CTA ────────────────────────────── */
+    #reserve {
+      padding: var(--gap-2xl) clamp(2rem, 8vw, 9rem);
+      background: var(--cream);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--gap-md);
+    }
+
+    .reserve-label {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 1s, transform 1s;
+    }
+
+    .reserve-label.visible { opacity: 1; transform: translateY(0); }
+
+    .reserve-title {
+      font-size: clamp(1.6rem, 4vw, 2.8rem);
+      font-weight: 400;
+      letter-spacing: 0.2em;
+      color: var(--ink);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s 0.15s, transform 1s 0.15s;
+    }
+
+    .reserve-title.visible { opacity: 1; transform: translateY(0); }
+
+    .reserve-note {
+      font-size: 0.82rem;
+      color: var(--stone);
+      letter-spacing: 0.08em;
+      max-width: 360px;
+      line-height: 2;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 1s 0.3s, transform 1s 0.3s;
+    }
+
+    .reserve-note.visible { opacity: 1; transform: translateY(0); }
+
+    .btn-reserve {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: var(--gap-sm);
+      padding: 1.1rem 3rem;
+      border: 1px solid var(--ink);
+      font-family: var(--font-ja);
+      font-size: 0.85rem;
+      letter-spacing: 0.35em;
+      color: var(--ink);
+      text-decoration: none;
+      background: transparent;
+      transition: background 0.4s, color 0.4s;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 1s 0.45s, transform 1s 0.45s, background 0.4s, color 0.4s;
+    }
+
+    .btn-reserve.visible { opacity: 1; transform: translateY(0); }
+    .btn-reserve:hover { background: var(--ink); color: var(--cream); }
+
+    .btn-arrow {
+      font-family: var(--font-latin);
+      font-size: 0.75rem;
+      opacity: 0.5;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .btn-reserve:hover .btn-arrow { transform: translateX(4px); opacity: 1; }
+
+    /* ─── Footer ─────────────────────────────────── */
+    footer {
+      padding: var(--gap-lg) clamp(2rem, 8vw, 9rem);
+      background: var(--ink);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 2rem;
+    }
+
+    .footer-logo {
+      font-size: 1.4rem;
+      letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.7);
+    }
+
+    .footer-info {
+      text-align: right;
+    }
+
+    .footer-info p {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.3);
+      line-height: 2;
+    }
+
+    /* ─── Animations ─────────────────────────────── */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; transform: scaleY(1); }
+      50%       { opacity: 1;   transform: scaleY(1.15); }
+    }
+
+    @keyframes mapPulse {
+      0%, 100% { box-shadow: 0 0 0 8px rgba(139,115,85,0.12), 0 0 0 16px rgba(139,115,85,0.05); }
+      50%       { box-shadow: 0 0 0 12px rgba(139,115,85,0.18), 0 0 0 24px rgba(139,115,85,0.07); }
+    }
+
+    /* ─── Responsive ─────────────────────────────── */
+    @media (max-width: 760px) {
+      header { padding: 1.4rem 1.8rem; }
+      nav .nav-hide { display: none; }
+
+      .cuisine-grid,
+      .access-grid { grid-template-columns: 1fr; gap: var(--gap-lg); }
+
+      footer { flex-direction: column; align-items: flex-start; }
+      .footer-info { text-align: left; }
+
+      .concept-philosophy { flex-direction: column; gap: 0.8rem; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Hello shingsing</h1>
-  <p>これがGitHubで公開した最初のページです。</p>
+
+  <!-- ─── Header ─── -->
+  <header>
+    <a href="#" class="logo">一柿</a>
+    <nav>
+      <a href="#concept" class="nav-hide">コンセプト</a>
+      <a href="#cuisine" class="nav-hide">お料理</a>
+      <a href="#access" class="nav-hide">アクセス</a>
+      <a href="#reserve" class="nav-reserve">ご予約</a>
+    </nav>
+  </header>
+
+  <!-- ─── Hero ─── -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <p class="hero-label latin-sm">Shobara, Hiroshima</p>
+      <h1 class="hero-title kanji-display">一柿</h1>
+      <p class="hero-sub">I C H I G A K I</p>
+      <p class="hero-tagline">
+        里山の恵みを、ただ静かに、皿の上へ。
+      </p>
+    </div>
+    <div class="scroll-line">
+      <span>scroll</span>
+      <div class="scroll-line-bar"></div>
+    </div>
+  </section>
+
+  <!-- ─── Concept ─── -->
+  <section id="concept">
+    <div class="section-label">
+      <div class="section-label-line"></div>
+      <span class="section-number">01</span>
+      <span class="section-name">Concept</span>
+    </div>
+    <div class="concept-inner">
+      <h2 class="concept-title kanji-display">
+        食べることが、<br>この土地を守ることに繋がる。
+      </h2>
+      <p class="concept-body">
+        広島県の最北部、中国山地の懐に位置する庄原市。
+        山の幸、川の幸、獣の幸が四季ごとに豊かに実るこの土地で、
+        料理人・三河功治は自ら狩猟し、生産者と向き合い、
+        裏山の竹林から筍を取ることから料理を始めます。
+        <br><br>
+        厨房の外から始まる料理。それが一柿の原点です。
+      </p>
+      <div class="concept-philosophy">
+        <span class="philosophy-ja kanji-display">妙味必淡</span>
+        <p class="philosophy-caption">
+          余分なものを削ぎ落とし、食材そのものの声を聴く。<br>
+          塩も、甘みも、油脂も、必要最小限に。<br>
+          それでいて、確かな輪郭がある。
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Cuisine ─── -->
+  <section id="cuisine">
+    <div class="section-label">
+      <div class="section-label-line"></div>
+      <span class="section-number">02</span>
+      <span class="section-name">Cuisine</span>
+    </div>
+    <div class="cuisine-grid">
+      <div class="cuisine-text">
+        <h2 class="cuisine-title kanji-display">
+          庄原の一日を、<br>皿の上で辿る。
+        </h2>
+        <p class="cuisine-body">
+          食事は庭から始まります。鎌峰山から引いた山水を口にすることが最初の一皿。
+          庭でのアミューズを経て、古民家の中へ。
+          季節の山菜、川で泳いでいた魚、その日の朝に仕留めたジビエ。
+          コースは庄原の一日を、そのまま辿るように続きます。
+        </p>
+        <div class="cuisine-items">
+          <div class="cuisine-item">
+            <span class="cuisine-item-ja">山の幸 — 山菜・茸・木の実</span>
+            <span class="cuisine-item-en">Mountain</span>
+          </div>
+          <div class="cuisine-item">
+            <span class="cuisine-item-ja">川の幸 — 渓流魚・川海老</span>
+            <span class="cuisine-item-en">River</span>
+          </div>
+          <div class="cuisine-item">
+            <span class="cuisine-item-ja">獣の幸 — 猪・鹿・山鳥</span>
+            <span class="cuisine-item-en">Game</span>
+          </div>
+          <div class="cuisine-item">
+            <span class="cuisine-item-ja">庭の水 — 鎌峰山の湧水</span>
+            <span class="cuisine-item-en">Spring water</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cuisine-visual">
+        <!-- Ink-wash art block A -->
+        <div class="art-block">
+          <svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="blur1"><feGaussianBlur stdDeviation="18"/></filter>
+              <filter id="blur2"><feGaussianBlur stdDeviation="6"/></filter>
+              <filter id="blur3"><feGaussianBlur stdDeviation="2.5"/></filter>
+            </defs>
+            <rect width="480" height="360" fill="#f0ede8"/>
+            <!-- Mountain silhouette wash -->
+            <ellipse cx="200" cy="290" rx="240" ry="110" fill="rgba(60,50,40,0.06)" filter="url(#blur1)"/>
+            <ellipse cx="340" cy="310" rx="180" ry="90" fill="rgba(80,70,55,0.05)" filter="url(#blur1)"/>
+            <!-- Distant ridge -->
+            <path d="M0 220 Q60 170 130 185 Q200 200 260 165 Q330 130 400 155 Q450 170 480 160 L480 360 L0 360 Z"
+                  fill="rgba(50,43,35,0.07)" filter="url(#blur2)"/>
+            <!-- Mid ridge -->
+            <path d="M0 255 Q80 215 160 228 Q240 240 310 210 Q380 185 480 205 L480 360 L0 360 Z"
+                  fill="rgba(45,38,30,0.09)" filter="url(#blur2)"/>
+            <!-- Near ground -->
+            <path d="M0 295 Q120 275 240 285 Q360 295 480 275 L480 360 L0 360 Z"
+                  fill="rgba(40,33,25,0.11)" filter="url(#blur3)"/>
+            <!-- Mist streaks -->
+            <path d="M30 200 Q160 195 280 202 Q380 208 460 198"
+                  stroke="rgba(255,255,255,0.55)" stroke-width="18" fill="none" filter="url(#blur2)"/>
+            <path d="M60 235 Q200 229 340 237"
+                  stroke="rgba(255,255,255,0.4)" stroke-width="12" fill="none" filter="url(#blur2)"/>
+            <!-- Single branch -->
+            <path d="M380 60 Q360 100 345 140 Q335 165 320 185"
+                  stroke="rgba(40,30,20,0.25)" stroke-width="1.5" fill="none" filter="url(#blur3)"/>
+            <path d="M345 140 Q330 125 315 118"
+                  stroke="rgba(40,30,20,0.2)" stroke-width="1" fill="none"/>
+            <path d="M360 110 Q375 95 385 88"
+                  stroke="rgba(40,30,20,0.18)" stroke-width="1" fill="none"/>
+          </svg>
+        </div>
+
+        <!-- Ink-wash art block B (smaller, offset) -->
+        <div class="art-block art-block-sm">
+          <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="blur4"><feGaussianBlur stdDeviation="12"/></filter>
+              <filter id="blur5"><feGaussianBlur stdDeviation="3"/></filter>
+            </defs>
+            <rect width="240" height="240" fill="#e8e4de"/>
+            <!-- Bowl suggestion -->
+            <ellipse cx="120" cy="145" rx="75" ry="22" fill="rgba(45,38,28,0.08)" filter="url(#blur4)"/>
+            <path d="M50 120 Q55 165 120 175 Q185 165 190 120 Q180 105 120 102 Q60 105 50 120 Z"
+                  fill="rgba(55,46,35,0.1)" filter="url(#blur5)"/>
+            <!-- Ingredient dots — evocative -->
+            <circle cx="100" cy="128" r="8" fill="rgba(80,60,40,0.15)" filter="url(#blur5)"/>
+            <circle cx="130" cy="122" r="5" fill="rgba(60,80,50,0.12)" filter="url(#blur5)"/>
+            <circle cx="115" cy="135" r="6" fill="rgba(70,55,35,0.1)" filter="url(#blur5)"/>
+            <!-- Steam lines -->
+            <path d="M95 100 Q98 85 93 72" stroke="rgba(180,170,155,0.5)" stroke-width="1" fill="none" filter="url(#blur5)"/>
+            <path d="M120 96 Q124 80 120 66" stroke="rgba(180,170,155,0.5)" stroke-width="1" fill="none" filter="url(#blur5)"/>
+            <path d="M145 100 Q142 84 147 72" stroke="rgba(180,170,155,0.5)" stroke-width="1" fill="none" filter="url(#blur5)"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Access ─── -->
+  <section id="access">
+    <div class="section-label">
+      <div class="section-label-line"></div>
+      <span class="section-number">03</span>
+      <span class="section-name">Access</span>
+    </div>
+    <div class="access-grid">
+      <div>
+        <h2 class="access-title kanji-display">
+          来ること自体が、<br>旅のはじまり。
+        </h2>
+        <p class="access-body">
+          庄原は、広島市から車で約二時間。
+          都市の喧騒から離れ、中国山地の山あいへと向かう道のりは、
+          すでに一柿の体験の一部です。
+          窓の外に広がる里山の風景とともに、どうぞゆっくりお越しください。
+        </p>
+        <div class="access-detail">
+          <div class="access-row">
+            <span class="access-row-label">Address</span>
+            <span class="access-row-value">広島県庄原市<br>（詳細はご予約後にご案内します）</span>
+          </div>
+          <div class="access-row">
+            <span class="access-row-label">By Car</span>
+            <span class="access-row-value">広島ICより中国自動車道経由 約90分<br>駐車場あり</span>
+          </div>
+          <div class="access-row">
+            <span class="access-row-label">By Train</span>
+            <span class="access-row-value">芸備線 備後庄原駅より<br>お迎え相談可（ご予約時にご確認ください）</span>
+          </div>
+          <div class="access-row">
+            <span class="access-row-label">Hours</span>
+            <span class="access-row-value">完全予約制<br>営業日はご予約時にご確認ください</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="access-map-placeholder">
+        <!-- Topographic-style map illustration -->
+        <svg viewBox="0 0 360 380" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;width:100%;height:100%;">
+          <defs>
+            <filter id="mapblur"><feGaussianBlur stdDeviation="2.5"/></filter>
+          </defs>
+          <!-- Topo contour lines -->
+          <ellipse cx="180" cy="185" rx="145" ry="130" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <ellipse cx="180" cy="185" rx="115" ry="103" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <ellipse cx="180" cy="185" rx="88" ry="78" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          <ellipse cx="180" cy="185" rx="62" ry="55" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+          <ellipse cx="180" cy="185" rx="38" ry="34" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <!-- Rivers -->
+          <path d="M20 80 Q80 120 120 160 Q150 185 180 190" stroke="rgba(139,115,85,0.25)" stroke-width="1.5" fill="none" filter="url(#mapblur)"/>
+          <path d="M340 50 Q290 110 250 150 Q215 175 180 190" stroke="rgba(139,115,85,0.2)" stroke-width="1" fill="none" filter="url(#mapblur)"/>
+          <path d="M180 190 Q175 240 160 310" stroke="rgba(139,115,85,0.18)" stroke-width="1" fill="none" filter="url(#mapblur)"/>
+          <!-- Road -->
+          <path d="M10 340 Q90 310 150 270 Q165 255 180 245" stroke="rgba(255,255,255,0.1)" stroke-width="2" stroke-dasharray="6 4" fill="none"/>
+          <path d="M180 245 Q195 230 220 210 Q270 175 350 150" stroke="rgba(255,255,255,0.07)" stroke-width="1.5" stroke-dasharray="6 4" fill="none"/>
+        </svg>
+        <div class="map-dot"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Reserve CTA ─── -->
+  <section id="reserve">
+    <div class="section-label reserve-label">
+      <div class="section-label-line" style="background:var(--mist);"></div>
+      <span class="section-number">04</span>
+      <span class="section-name">Reserve</span>
+    </div>
+    <h2 class="reserve-title kanji-display">ご予約</h2>
+    <p class="reserve-note">
+      一柿は完全予約制です。<br>
+      ご来店の三日前までにご連絡ください。
+    </p>
+    <a href="mailto:info@ichigaki.jp" class="btn-reserve">
+      ご予約はこちら
+      <span class="btn-arrow">→</span>
+    </a>
+  </section>
+
+  <!-- ─── Footer ─── -->
+  <footer>
+    <span class="footer-logo kanji-display">一柿</span>
+    <div class="footer-info">
+      <p>© 2026 一柿 / Ichigaki</p>
+      <p>広島県庄原市　完全予約制</p>
+    </div>
+  </footer>
+
+  <!-- ─── Scroll animation ─── -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll(
+      '.section-label, .concept-title, .concept-body, .concept-philosophy, ' +
+      '.cuisine-text, .cuisine-visual, ' +
+      '.access-title, .access-body, .access-detail, .access-map-placeholder, ' +
+      '.reserve-label, .reserve-title, .reserve-note, .btn-reserve'
+    ).forEach(el => observer.observe(el));
+  </script>
+
 </body>
 </html>
